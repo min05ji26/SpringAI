@@ -7,6 +7,7 @@ Spring + LLM 학습 기록. 주차별로 폴더를 나눠서 정리한다.
 | 주차 | 주제 | 정리 |
 |------|------|------|
 | 1주차 | LLM 연동 + 채팅 UI 테스트 | [week01](week01/) |
+| 2주차 | ChatModel vs ChatClient, call() vs stream() | [week02](week02/) |
 
 ## 공통 실행 메모
 
