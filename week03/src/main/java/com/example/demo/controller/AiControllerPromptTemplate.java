@@ -22,10 +22,4 @@ public class AiControllerPromptTemplate {
         return aiService.promptTemplate1(statement,language);
     }
 
-    @PostMapping("/role")
-    public String role(String role, String question)
-    {
-        return aiService.roleTemplate(role, question);
-    }
-
 }

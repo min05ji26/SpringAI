@@ -126,11 +126,12 @@ Ollama는 기본값(`localhost:11434`)을 써서 따로 설정이 없다.
 
 ## 다음에 볼 것 / 남은 과제 (현재 코드 상태)
 
-수업 중 작성하던 상태 그대로 올려서 **지금은 빌드가 안 된다.**
+**고친 것 (컴파일 통과)**
+- `AiControllerPromptTemplate`의 `/ai/role` 삭제 — 없는 메서드 `roleTemplate()`을 불러서 컴파일 에러였음. 역할 기능은 `AiRoleController`(`/role`)로 일원화
+- `AiRoleService`에 `@Service` 추가 — 없으면 `AiRoleController`에 주입이 안 됨
+- `AiRoleService`의 `render()`에서 `question` 제거 — 템플릿엔 `{role}`만 있고 질문은 `.user()`로 이미 들어감
 
-- `AiControllerPromptTemplate`의 `/ai/role`이 `aiService.roleTemplate()`을 부르는데 그런 메서드가 없음 → 컴파일 에러. 역할 기능은 `AiRoleController`(`/role`)로 옮긴 것 같으니 이쪽 엔드포인트를 지우면 됨
-- `AiRoleService`에 `@Service`가 없어서 `AiRoleController`에 주입이 안 됨
-- `AiRoleService`에서 `render()`에 `question`도 넣고 있지만 템플릿엔 `{role}`만 있음 (질문은 `.user()`로 이미 들어감)
+**남은 것**
 - Ollama·OpenAI 스타터를 **둘 다** 넣어서 `ChatModel` 빈이 2개 → `ChatClient.Builder` 자동 주입이 어떤 모델을 쓸지 애매해짐. 둘 다 쓰려면 `ChatClient.create(ollamaChatModel)` 처럼 직접 만들어야 함 (2주차 메모 참고)
 - `promptTemplate2~4`는 컨트롤러에 연결 안 됨
 - `/ai/ollamaChat` 스트리밍에 `produces = MediaType.TEXT_EVENT_STREAM_VALUE` 필요

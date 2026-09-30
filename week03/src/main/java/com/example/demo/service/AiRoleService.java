@@ -2,9 +2,11 @@ package com.example.demo.service;
 
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.prompt.SystemPromptTemplate;
+import org.springframework.stereotype.Service;
 
 import java.util.Map;
 
+@Service
 public class AiRoleService {
 
     private ChatClient chatClient;
@@ -20,7 +22,7 @@ public class AiRoleService {
 
     public String consult(String role, String question){
         return chatClient.prompt()
-                .system(systemPromptTemplate.render(Map.of("role",role, "question", question)))
+                .system(systemPromptTemplate.render(Map.of("role",role)))
                 .user(question)
                 .call()
                 .content();
