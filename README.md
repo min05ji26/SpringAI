@@ -10,6 +10,7 @@ Spring + LLM 학습 기록. 주차별로 폴더를 나눠서 정리한다.
 | 2주차 | ChatModel vs ChatClient, call() vs stream() | [week02](week02/) |
 | 3주차 | Ollama 로컬 모델 + PromptTemplate | [week03](week03/) |
 | 4주차 | 퓨샷·스텝백 프롬프트 + Output Converter | [week04](week04/) |
+| 5주차 | 임베딩 + pgvector 유사도 검색 (+ Output Converter 복습) | [week05](week05/) |
 
 ## 과제
 
@@ -19,7 +20,8 @@ Spring + LLM 학습 기록. 주차별로 폴더를 나눠서 정리한다.
 
 ## 공통 실행 메모
 
-- 각 주차 폴더는 독립된 Gradle 프로젝트다.
+- 각 주차 폴더는 독립된 Gradle 프로젝트다. (5주차는 `week05/book`, `week05/vectorstore` 두 개)
+- IntelliJ에서는 루트에 `secret.properties`(git 제외)를 두면 키를 자동으로 읽는다 (Policy, week05 적용).
 - API 키는 코드에 넣지 않고 환경변수로 주입한다. 실행 전 `OPEN_API_KEY` 설정 필요.
   ```bash
   export OPEN_API_KEY=발급받은_키
