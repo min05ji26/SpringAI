@@ -11,6 +11,12 @@ Spring + LLM 학습 기록. 주차별로 폴더를 나눠서 정리한다.
 | 3주차 | Ollama 로컬 모델 + PromptTemplate | [week03](week03/) |
 | 4주차 | 퓨샷·스텝백 프롬프트 + Output Converter | [week04](week04/) |
 
+## 과제
+
+| 과제 | 내용 | 정리 |
+|------|------|------|
+| 정책 추천 | 나이·성별·월 소득 → 맞춤 정책 추천 API + UI (퓨샷) | [Policy](Policy/) |
+
 ## 공통 실행 메모
 
 - 각 주차 폴더는 독립된 Gradle 프로젝트다.
