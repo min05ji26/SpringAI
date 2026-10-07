@@ -9,6 +9,7 @@ Spring + LLM 학습 기록. 주차별로 폴더를 나눠서 정리한다.
 | 1주차 | LLM 연동 + 채팅 UI 테스트 | [week01](week01/) |
 | 2주차 | ChatModel vs ChatClient, call() vs stream() | [week02](week02/) |
 | 3주차 | Ollama 로컬 모델 + PromptTemplate | [week03](week03/) |
+| 4주차 | 퓨샷·스텝백 프롬프트 + Output Converter | [week04](week04/) |
 
 ## 공통 실행 메모
 
