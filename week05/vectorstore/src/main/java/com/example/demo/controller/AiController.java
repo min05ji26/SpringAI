@@ -22,6 +22,7 @@ public class AiController {
         aiService.addDocument();
     }
 
+    //string으로 이어 붙이는 방법
     @PostMapping("/search")
     public String searchDocument(String question){
         List<Document> documentlist = aiService.searchDocument(question);
@@ -33,6 +34,9 @@ public class AiController {
         return text;
     }
 
+    //객체. HIT으로 이어 붙이는 방법
+    //만약 몇 개인지 개수를 받아서 작성하는 식이면 매개변수 쪽에 topK를 받아와서 서비스로 넘길 수 있도록 하여도 됨
+    //그럼서비스쪽은 쿼리문과 비슷하게.
     @PostMapping("/search2")
     public List<Hit> searchDocument2(String question){
         List<Document> documentlist = aiService.searchDocument(question);

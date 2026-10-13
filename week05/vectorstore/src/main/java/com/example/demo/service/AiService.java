@@ -11,10 +11,12 @@ import java.util.Map;
 
 @Service
 public class AiService {
+    //벡터를 주입. 어노테이션 필수!!
     @Autowired
     private VectorStore vectorStore;
 
     public void addDocument(){
+        //new Documnet("본문 텍스트", Map.of("키",값,"키",값)) 본문텍스트 -> 검색될 내용, 키값 -> 메타데이터
         List<Document> documents = List.of(
                 /*new Document("대통령 선거는 5년마다 있습니다.", Map.of("source","헌법","year",1987)),
                 new Document("대통령 임기는 4년입니다.",           Map.of("source", "헌법", "year", 1980)),
@@ -45,20 +47,23 @@ public class AiService {
                 new Document("헌법재판소는 헌법과 관련된 사항을 관장한다.", Map.of("source","헌법","year",1987))*/
 
         );
+        //위
         vectorStore.add(documents);
     }
 
-    public List<Document> searchDocument(String question){
+    //옵션을 하나도 안 준 기본 값
+    public List<Document> searchDocument(String question)
+    {
         return vectorStore.similaritySearch(question);
     }
 
-    //서치 리퀘스트
+    //서치 리퀘스트, 이런 조건으로 찾아줘를 적어서 넘기는 것
     public List<Document> searchDocument3(String question){
         return vectorStore.similaritySearch(
                 SearchRequest.builder()
-                        .query(question)
-                        .topK(2)
-                        .similarityThreshold(0.4)
+                        .query(question) // 무엇을 찾을 지 쓰는 것. 필수적임
+                        .topK(2)    //몇 개까지 찾을지
+                        .similarityThreshold(0.4)   //얼마나 비슷할지 (0이면 다 받음)
                         .filterExpression("source == '헌법' && year >= 1987")
                         .build()
         );
