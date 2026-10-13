@@ -46,23 +46,32 @@ public class AiService2 {
                 .entity(new ListOutputConverter());
     }
 
+    //빈아웃풋컨버터, 컨버터는 정확이 이 모양으로 답하라는 지시문
+    //리턴타입이 hotel
     public Hotel beanOutput1(String city){
+        //변환해주는 문장
         BeanOutputConverter<Hotel> converter = new BeanOutputConverter(Hotel.class);
         PromptTemplate promptTemplate = PromptTemplate.builder()
                 .template("{city}에서 유명한 호텔 목록 5개를 출력해줘. {format}")
+                //이쪽에서 getter 제한이 걸리는데 어떻게 해야하나?
                 .build();
+        //builder.build()가 아닌 둘이 따로 띄어서 빌드를 마지막에 써야함
 
+        //위에서 짠 프롬프트를 컨버터에서 가져온 포맷으로 넣기
         Prompt prompt = promptTemplate.create(
                 Map.of("city", city, "format", converter.getFormat())
         );
 
+        //챗클라이언트에 넣기
         String result = chatClient.prompt(prompt)
                 .call()
                 .content();
+        //받은 String을 변환기로 객체로 바꾸기
         Hotel hotel= converter.convert(result);
         return hotel;
     }
 
+    //빈아웃풋컨버터 고수준
     public Hotel beanOutput2(String city){
         return chatClient.prompt()
                 .user("%s에서 유명한 호텔 목록 5개를 출력해줘.".formatted(city))

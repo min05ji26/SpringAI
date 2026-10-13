@@ -14,14 +14,16 @@ public class AiServiceByChatClient {
         this.chatClient = chatClientBuilder.build();
     }
 
+    // 옵션은 call, 또는 stream 이전에 설정을 해야함
     public String generateText(String question){
         return this.chatClient.prompt()
                 .system("응답에 대해 친절하고 이모티콘과 같이 대답해줘")
                 .user(question)
-                //스타트 옵션 쓸거면 옵션 설정 따로 안해도됨
+                //스타트 옵션(자동) 쓸거면 옵션 설정 따로 안해도됨
                 .options(OpenAiChatOptions.builder()
-                        .temperature(0.3)
-                        .maxTokens(1000))
+                        .temperature(0.3) // 답변 다양성 (0.0 -> 매번 같은 답, 0.8 -> 창의적)
+                        .maxTokens(1000)) //답변 최대 길이
+                //.model() // 어떤 모델 쓸지, 프로퍼티에 쓴 것 보다 우선적으로 선정이 됨
                 .call()
                 .content();
     }

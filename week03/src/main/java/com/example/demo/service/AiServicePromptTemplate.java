@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import reactor.core.publisher.Flux;
 
 import java.util.Map;
-
+//임포트문 잘 보고 임포트 안된 것 있으면 임포트하기.
 @Service
 public class AiServicePromptTemplate {
     private ChatClient chatClient;
@@ -18,6 +18,8 @@ public class AiServicePromptTemplate {
         this.chatClient = chatClientbuilder.build();
     }
 
+    //render은 .user, .system에 넣어주고 create는 chatClient.prompt()에 넣어줌
+    //고정적으로 프롬프트를 작성
     PromptTemplate systemTemplate = SystemPromptTemplate.builder()
             .template("""
                     당신은 전문적이고 다양한 다국어 번역 AI 입니다.
@@ -26,12 +28,14 @@ public class AiServicePromptTemplate {
                     """)
             .build();
 
-    //가변적인
+    //가변적으로 프롬프트를 작성
     PromptTemplate userTemplate = PromptTemplate.builder()
             .template("다음 한국어 문장을 {language}로 번역해주세요\n" +
                     "문장 : {statement}")
             .build();
 
+    //위 userTemplate을 사용하여 챗클라이언트에 넣어줌
+    //create() 방식, 하나 씩만 넘길 수 있음 -> userTemplate만 넘기는 이유
     public String promptTemplate1(String statement, String language){
         Prompt prompt = userTemplate.create(Map.of("statement", statement, "language", language));
         return chatClient.prompt(prompt)
@@ -39,14 +43,17 @@ public class AiServicePromptTemplate {
                 .content();
     }
 
+    //createMessage 방식, 두 개 사용 가능. 객체로 받음
     public String promptTemplate2(String statement, String language){
 
         return chatClient.prompt()
                 .messages(systemTemplate.createMessage(),userTemplate.createMessage(Map.of("statement", statement, "language", language)))
+                //시스템은 고정적이라 Map 없이 호출
                 .call()
                 .content();
     }
 
+    //render 방식. String 으로 받음
     public String promptTemplate3(String statement, String language){
 
         return chatClient.prompt()
@@ -56,6 +63,7 @@ public class AiServicePromptTemplate {
                 .content();
     }
 
+    //템플릿 없이 %s 방식
     public String promptTemplate4(String statement, String language){
         String systemText = """
                 당신은 전문적이고 다양한 다국어 번역 AI 입니다.
