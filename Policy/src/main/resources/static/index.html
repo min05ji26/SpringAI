@@ -181,6 +181,117 @@
             word-break: keep-all;
         }
 
+        .want-input {
+            width: 100%;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            padding: 12px;
+            font-size: 14px;
+            outline: none;
+        }
+
+        .want-input:focus {
+            border-color: #333;
+        }
+
+        .chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-top: 8px;
+        }
+
+        .chips button {
+            border: 1px solid #ccc;
+            background: white;
+            border-radius: 15px;
+            padding: 5px 10px;
+            font-size: 12px;
+            cursor: pointer;
+        }
+
+        .chips button:hover {
+            border-color: #333;
+        }
+
+        .card .reason {
+            font-size: 13px;
+            color: #555;
+            margin-top: 6px;
+            line-height: 1.4;
+        }
+
+        .section-title {
+            font-size: 13px;
+            font-weight: bold;
+            margin: 20px 0 8px;
+        }
+
+        .hit {
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            padding: 10px 12px;
+            margin-bottom: 8px;
+            font-size: 13px;
+        }
+
+        .hit-top {
+            display: flex;
+            justify-content: space-between;
+            gap: 8px;
+            font-weight: bold;
+            margin-bottom: 4px;
+        }
+
+        .hit-score {
+            color: #888;
+            font-weight: normal;
+            white-space: nowrap;
+        }
+
+        .hit-text {
+            color: #666;
+            line-height: 1.4;
+        }
+
+        .bar {
+            height: 4px;
+            background: #eee;
+            border-radius: 2px;
+            margin-top: 6px;
+            overflow: hidden;
+        }
+
+        .bar div {
+            height: 100%;
+            background: #333;
+        }
+
+        .hit.picked {
+            border-color: #333;
+        }
+
+        .footer {
+            border-top: 1px solid #ddd;
+            padding: 12px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 12px;
+            color: #888;
+            gap: 10px;
+        }
+
+        #addBtn {
+            border: 1px solid #ccc;
+            background: white;
+            border-radius: 8px;
+            padding: 6px 10px;
+            font-size: 12px;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+
         .notice {
             font-size: 12px;
             color: #888;
@@ -221,7 +332,7 @@
 
     <div class="header">
         <h1>🏛️ 맞춤 정책 추천</h1>
-        <p>나이, 성별, 월 소득을 입력하면 AI가 받을 수 있는 정책을 찾아드려요</p>
+        <p>정책 DB에서 조건에 맞는 정책을 벡터 검색으로 찾고, AI가 그 중에서 골라드려요</p>
     </div>
 
     <div class="form">
@@ -251,6 +362,18 @@
             </div>
         </div>
 
+        <div class="field">
+            <label for="want">원하는 도움</label>
+            <input type="text" id="want" class="want-input" placeholder="예) 자취방 월세가 부담돼요">
+            <div class="chips">
+                <button type="button">자취방 월세</button>
+                <button type="button">목돈 모으기</button>
+                <button type="button">자격증 공부</button>
+                <button type="button">취업 준비</button>
+                <button type="button">교통비 줄이기</button>
+            </div>
+        </div>
+
         <p id="error" class="error"></p>
 
         <button id="sendBtn">정책 찾기</button>
@@ -258,11 +381,17 @@
 
     <div id="result" class="result"></div>
 
+    <div class="footer">
+        <span id="addMsg">처음 실행했다면 정책 자료를 먼저 넣어주세요</span>
+        <button id="addBtn">정책 데이터 넣기</button>
+    </div>
+
 </div>
 
 <script>
     const ageInput = document.getElementById("age");
     const incomeInput = document.getElementById("income");
+    const wantInput = document.getElementById("want");
     const sendBtn = document.getElementById("sendBtn");
     const errorBox = document.getElementById("error");
     const resultBox = document.getElementById("result");
@@ -281,13 +410,38 @@
         "대출": "🏦",
         "금융": "🏦",
         "건강": "🏥",
+        "생활": "🤝",
+        "교통": "🚌",
         "의료": "🏥"
     };
 
     sendBtn.addEventListener("click", recommend);
 
+    // 예시 버튼을 누르면 원하는 도움 칸에 채워넣기
+    document.querySelectorAll(".chips button").forEach(btn => {
+        btn.addEventListener("click", () => {
+            wantInput.value = btn.textContent;
+        });
+    });
+
+    // 정책 자료를 벡터 DB에 넣기 (/policy/add)
+    document.getElementById("addBtn").addEventListener("click", async () => {
+        const addBtn = document.getElementById("addBtn");
+        const addMsg = document.getElementById("addMsg");
+        addBtn.disabled = true;
+        addMsg.textContent = "임베딩해서 저장하는 중...";
+        try {
+            const response = await fetch("/policy/add", { method: "POST" });
+            if (!response.ok) throw new Error(response.status);
+            addMsg.textContent = "정책 자료를 넣었어요. 다시 누르면 중복으로 들어가요!";
+        } catch (err) {
+            addMsg.textContent = "저장 실패 (" + err.message + ")";
+            addBtn.disabled = false;
+        }
+    });
+
     // 입력칸에서 엔터를 눌러도 전송
-    [ageInput, incomeInput].forEach(input => {
+    [ageInput, incomeInput, wantInput].forEach(input => {
         input.addEventListener("keydown", e => {
             if (e.key === "Enter") recommend();
         });
@@ -297,6 +451,7 @@
         const age = ageInput.value.trim();
         const income = incomeInput.value.trim();
         const gender = document.querySelector("input[name='gender']:checked").value;
+        const want = wantInput.value.trim() || "나에게 맞는 지원 정책";
 
         if (age === "" || income === "") {
             errorBox.textContent = "나이와 월 소득을 모두 입력해주세요.";
@@ -304,8 +459,9 @@
         }
         errorBox.textContent = "";
 
-        // 백엔드는 info 하나만 받으므로 "24살, 여자, 월 150만원" 형태로 합쳐서 보낸다
-        const info = `${age}살, ${gender}, 월 ${income}만원`;
+        // 필터에 쓰려고 나이·성별·소득을 따로따로 보낸다
+        const info = `${age}살, ${gender}, 월 ${income}만원, 원하는 것 : ${want}`;
+        const params = { age: age, gender: gender, income: income, want: want };
 
         sendBtn.disabled = true;
         resultBox.classList.add("show");
@@ -314,27 +470,34 @@
         `;
 
         try {
-            const response = await fetch("/policy/reco", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/x-www-form-urlencoded"
-                },
-                body: new URLSearchParams({ info: info })
-            });
+            // /search : 벡터 검색 결과(후보), /reco : 후보 중 AI가 고른 결과
+            const [hits, text] = await Promise.all([
+                post("/policy/search", params).then(r => r.json()),
+                post("/policy/reco", params).then(r => r.text())
+            ]);
 
-            if (!response.ok) {
-                throw new Error("서버 응답 오류 (" + response.status + ")");
-            }
-
-            const text = await response.text();
             const policy = parsePolicy(text);
-            showResult(info, policy);
+            showResult(info, policy, hits);
 
         } catch (err) {
             resultBox.innerHTML = `<p class="error">추천을 불러오지 못했어요. ${escapeHtml(err.message)}</p>`;
         } finally {
             sendBtn.disabled = false;
         }
+    }
+
+    async function post(url, params) {
+        const response = await fetch(url, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded"
+            },
+            body: new URLSearchParams(params)
+        });
+        if (!response.ok) {
+            throw new Error("서버 응답 오류 (" + response.status + ")");
+        }
+        return response;
     }
 
     // 모델이 ```json ... ``` 으로 감싸서 줄 때도 있어서 { } 부분만 꺼내서 파싱
@@ -347,7 +510,7 @@
         return JSON.parse(text.substring(start, end + 1));
     }
 
-    function showResult(info, policy) {
+    function showResult(info, policy, hits) {
         const name = policy.policy_name || "알 수 없음";
         const type = policy.type || "기타";
         const icon = icons[type] || "📌";
@@ -359,10 +522,26 @@
                 <div>
                     <div class="type">${escapeHtml(type)}</div>
                     <div class="name">${escapeHtml(name)}</div>
+                    ${policy.reason ? `<div class="reason">${escapeHtml(policy.reason)}</div>` : ""}
                 </div>
             </div>
+
+            <div class="section-title">🔍 벡터 검색으로 찾은 후보 (조건 필터 + 유사도)</div>
+            ${hits.length === 0
+                ? `<div class="hit-text">조건에 맞는 정책이 없어요.</div>`
+                : hits.map(hit => `
+                    <div class="hit ${hit.name === name ? "picked" : ""}">
+                        <div class="hit-top">
+                            <span>${icons[hit.type] || "📌"} ${escapeHtml(hit.name)}${hit.name === name ? " ✓" : ""}</span>
+                            <span class="hit-score">유사도 ${hit.score.toFixed(3)}</span>
+                        </div>
+                        <div class="hit-text">${escapeHtml(hit.text)}</div>
+                        <div class="bar"><div style="width:${Math.round(hit.score * 100)}%"></div></div>
+                    </div>
+                `).join("")}
+
             <div class="notice">
-                ※ AI가 추천한 결과라 실제 지원 조건과 다르거나 종료된 정책일 수 있어요.
+                ※ AI는 위 후보 안에서만 골라요. 정책 자료는 직접 넣은 초안이라 실제 지원 조건과 다를 수 있어요.
                 신청 전 <a href="https://www.bokjiro.go.kr" target="_blank" rel="noopener">복지로</a>에서 꼭 확인하세요.
             </div>
         `;
